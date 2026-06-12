@@ -1,0 +1,8 @@
+# /etc/caddy/Caddyfile  — swap in your real domain.
+# Caddy fetches and renews HTTPS certs automatically.
+tools.yourdomain.com {
+    request_body {
+        max_size 25MB
+    }
+    reverse_proxy 127.0.0.1:8000
+}
