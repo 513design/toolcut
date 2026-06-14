@@ -25,6 +25,7 @@ import httpx
 import jwt
 import numpy as np
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from jwt import PyJWKClient
 
 import toolcut
@@ -45,6 +46,10 @@ CONTENT_TYPES = {".svg": "image/svg+xml", ".dxf": "application/dxf",
                  ".png": "image/png"}
 
 app = FastAPI(title="toolcut", version="2.1")
+
+# Allow browser-based clients (the web app) to call this API.
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"])
 
 _jwk_client = PyJWKClient(f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json") \
     if SUPABASE_URL else None
