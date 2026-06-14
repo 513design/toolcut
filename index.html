@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>toolcut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0d10; --panel:#15171c; --panel-2:#1b1e25; --line:#2a2f38;
+    --text:#e9eaec; --muted:#888e99; --accent:#ff5500; --accent-dim:#b83e00;
+    --ok:#46c46a; --err:#ff5b5b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Space Mono',ui-monospace,monospace; font-size:14px; line-height:1.5;
+    min-height:100vh; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+  .wrap{max-width:760px; margin:0 auto; padding:28px 20px 64px}
+
+  /* header */
+  header{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--line);
+    padding-bottom:16px; margin-bottom:28px; flex-wrap:wrap}
+  .mark{font-family:'Bebas Neue',sans-serif; font-size:42px; letter-spacing:2px; line-height:.8}
+  .mark b{color:var(--accent)}
+  .tag{color:var(--muted); font-size:12px; letter-spacing:.5px}
+  .who{margin-left:auto; display:flex; align-items:center; gap:12px; font-size:12px; color:var(--muted)}
+  .who span{color:var(--text)}
+
+  /* panels */
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:22px; margin-bottom:18px}
+  .eyebrow{font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:18px; color:var(--muted); margin:0 0 14px}
+  label.fld{display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:14px 0 6px}
+  input[type=email],input[type=password],select{
+    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text);
+    font-family:inherit; font-size:14px; padding:11px 12px; border-radius:3px}
+  input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+  /* buttons */
+  button{font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; border-radius:3px;
+    border:1px solid var(--line); background:var(--panel-2); color:var(--text);
+    padding:11px 16px; font-size:13px; letter-spacing:.5px}
+  button:hover{border-color:#3a414d}
+  .primary{background:var(--accent); border-color:var(--accent); color:#140a00; text-transform:uppercase; letter-spacing:1px}
+  .primary:hover{background:#ff6a26; border-color:#ff6a26}
+  .primary:disabled{opacity:.55; cursor:not-allowed; background:#7a4a2e; border-color:#7a4a2e}
+  .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .ghost{background:transparent}
+
+  /* dropzone */
+  .drop{border:1.5px dashed #3a414d; border-radius:4px; padding:30px 20px; text-align:center;
+    color:var(--muted); cursor:pointer; transition:border-color .15s, background .15s}
+  .drop:hover,.drop.over{border-color:var(--accent); background:#17120d}
+  .drop b{color:var(--text); font-weight:400}
+  .drop .big{font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; color:var(--text); display:block; margin-bottom:4px}
+  .thumb{max-height:180px; max-width:100%; border-radius:3px; border:1px solid var(--line); margin-top:4px}
+
+  .opts{display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end; margin-top:6px}
+  .opts > div{flex:1; min-width:150px}
+  .toggle{display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none; padding-bottom:11px}
+  .toggle input{accent-color:var(--accent); width:16px; height:16px}
+
+  /* result */
+  #result{display:none}
+  .overlay-img{width:100%; border:1px solid var(--line); border-radius:4px; display:block; background:#000}
+  .readout{display:flex; gap:14px; flex-wrap:wrap; margin:18px 0}
+  .gauge{flex:1; min-width:160px; background:var(--bg); border:1px solid var(--line);
+    border-left:3px solid var(--accent); border-radius:3px; padding:12px 14px}
+  .gauge .k{font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted)}
+  .gauge .v{font-family:'Bebas Neue',sans-serif; font-size:38px; line-height:1; letter-spacing:1px; color:var(--accent); margin-top:4px}
+  .gauge .v small{font-family:'Space Mono',monospace; font-size:13px; color:var(--muted); letter-spacing:0}
+
+  /* history */
+  .job{display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:12px}
+  .job:last-child{border-bottom:0}
+  .dot{width:8px; height:8px; border-radius:50%; flex:none}
+  .dot.done{background:var(--ok)} .dot.error{background:var(--err)} .dot.processing{background:var(--accent)}
+  .job .sz{color:var(--text)} .job .dt{margin-left:auto; color:var(--muted)}
+
+  .msg{font-size:12px; margin-top:12px; min-height:16px}
+  .msg.err{color:var(--err)} .msg.ok{color:var(--ok)} .msg.info{color:var(--muted)}
+  .spinner{display:inline-block; width:13px; height:13px; border:2px solid #ffffff55; border-top-color:#140a00;
+    border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:7px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  footer{color:var(--muted); font-size:11px; text-align:center; margin-top:34px; line-height:1.7}
+  .hidden{display:none !important}
+  @media (prefers-reduced-motion:reduce){.spinner{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">TOOL<b>CUT</b></div>
+    <div class="tag">photo → foam cutout</div>
+    <div class="who hidden" id="who"><span id="whoEmail"></span><button class="ghost" id="signout">Sign out</button></div>
+  </header>
+
+  <!-- AUTH -->
+  <section id="authView">
+    <div class="panel">
+      <p class="eyebrow">Sign in</p>
+      <label class="fld" for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" value="e2e-test@toolcut.local">
+      <label class="fld" for="pw">Password</label>
+      <input id="pw" type="password" autocomplete="current-password" value="ToolcutTest123!">
+      <div class="row">
+        <button class="primary" id="signin">Sign in</button>
+        <button id="signup">Create account</button>
+      </div>
+      <div class="msg info" id="authMsg">Pre-filled with your test account — just press Sign in.</div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="appView" class="hidden">
+    <div class="panel">
+      <p class="eyebrow">New cutout</p>
+      <div class="drop" id="drop">
+        <span class="big">Drop a photo</span>
+        <b>or tap to choose</b> — a tool flat on a full sheet of printer paper, shot from above
+        <input id="file" type="file" accept="image/*" capture="environment" class="hidden">
+        <div><img id="thumb" class="thumb hidden" alt=""></div>
+      </div>
+
+      <div class="opts">
+        <div>
+          <label class="fld" for="paper">Paper under the tool</label>
+          <select id="paper">
+            <option value="letter">US Letter (8.5 × 11 in)</option>
+            <option value="a4">A4 (210 × 297 mm)</option>
+          </select>
+        </div>
+        <label class="toggle"><input type="checkbox" id="fingers" checked> Add finger scoops</label>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="go" disabled>Make cutout</button>
+      </div>
+      <div class="msg" id="appMsg"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="panel" id="result">
+      <p class="eyebrow">Result</p>
+      <img id="overlay" class="overlay-img" alt="Detected outline over your photo">
+      <div class="readout">
+        <div class="gauge"><div class="k">Measured tool</div><div class="v" id="mTool">— <small>mm</small></div></div>
+        <div class="gauge"><div class="k">Cutout + clearance</div><div class="v" id="mCut">— <small>mm</small></div></div>
+      </div>
+      <div class="row">
+        <a id="dlDxf" class="primary" style="text-decoration:none" download>Download DXF</a>
+        <a id="dlSvg" download><button class="ghost">Download SVG</button></a>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="panel">
+      <p class="eyebrow">Recent</p>
+      <div id="history"><div class="msg info">No cutouts yet.</div></div>
+    </div>
+  </section>
+
+  <footer>
+    Test build · running over plain HTTP on your Lightsail IP.<br>
+    Add a domain + HTTPS before sharing with real people.
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   CONFIG — fill in SUPABASE_ANON_KEY with your PUBLISHABLE key
+   (the public one, safe to ship in a client). The other two
+   are already set for your project.
+   ============================================================ */
+const CONFIG = {
+  SUPABASE_URL:      'https://epyirdygcxwciintcrsu.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVweWlyZHlnY3h3Y2lpbnRjcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzU2NDMsImV4cCI6MjA5Njg1MTY0M30.sr5sRS0cuC-bz9W-n4wECd9XEbzEYeVS-wWdqp7QOe0',
+  API_BASE:          'http://3.23.254.220',
+};
+
+// localStorage fallback so this never crashes if previewed in a sandbox
+function makeStorage(){
+  try{ const k='__tc'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return localStorage; }
+  catch(e){ const m={}; return {getItem:k=>k in m?m[k]:null,setItem:(k,v)=>{m[k]=String(v)},removeItem:k=>{delete m[k]}}; }
+}
+const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY,
+  {auth:{persistSession:true, autoRefreshToken:true, storage:makeStorage()}});
+
+const $ = id => document.getElementById(id);
+const authView=$('authView'), appView=$('appView'), who=$('who');
+
+/* ---------- auth ---------- */
+function renderSession(session){
+  const on = !!session;
+  authView.classList.toggle('hidden', on);
+  appView.classList.toggle('hidden', !on);
+  who.classList.toggle('hidden', !on);
+  if(on){ $('whoEmail').textContent = session.user.email; loadHistory(); }
+}
+sb.auth.getSession().then(({data})=>renderSession(data.session));
+sb.auth.onAuthStateChange((_e,session)=>renderSession(session));
+
+function setMsg(el,text,kind){ el.className='msg '+(kind||''); el.textContent=text; }
+
+$('signin').onclick = async () => {
+  setMsg($('authMsg'),'Signing in…','info');
+  const {error} = await sb.auth.signInWithPassword({email:$('email').value.trim(), password:$('pw').value});
+  if(error) setMsg($('authMsg'), error.message, 'err');
+};
+$('signup').onclick = async () => {
+  setMsg($('authMsg'),'Creating account…','info');
+  const {data,error} = await sb.auth.signUp({email:$('email').value.trim(), password:$('pw').value});
+  if(error){ setMsg($('authMsg'), error.message, 'err'); return; }
+  if(!data.session) setMsg($('authMsg'),'Account created. Check your email to confirm, then sign in.','ok');
+};
+$('signout').onclick = () => sb.auth.signOut();
+
+/* ---------- file selection ---------- */
+const drop=$('drop'), fileInput=$('file'), thumb=$('thumb'), go=$('go');
+drop.onclick = e => { if(e.target.tagName!=='INPUT') fileInput.click(); };
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e=>{ if(e.dataTransfer.files[0]){ fileInput.files=e.dataTransfer.files; showThumb(); }});
+fileInput.onchange = showThumb;
+function showThumb(){
+  const f=fileInput.files[0]; if(!f) return;
+  thumb.src=URL.createObjectURL(f); thumb.classList.remove('hidden');
+  go.disabled=false; setMsg($('appMsg'),'','');
+}
+
+/* ---------- process ---------- */
+go.onclick = async () => {
+  const f=fileInput.files[0]; if(!f) return;
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){ setMsg($('appMsg'),'Session expired — sign in again.','err'); return; }
+
+  go.disabled=true; const label=go.textContent;
+  go.innerHTML='<span class="spinner"></span>Working…';
+  setMsg($('appMsg'),'','');
+  try{
+    const fd=new FormData();
+    fd.append('image', f);
+    fd.append('paper', $('paper').value);
+    fd.append('finger_holes', $('fingers').checked ? 'true':'false');
+    fd.append('debug','true');
+    const res = await fetch(CONFIG.API_BASE+'/process', {
+      method:'POST', headers:{Authorization:'Bearer '+session.access_token}, body:fd
+    });
+    if(res.status===200){
+      const j=await res.json(); showResult(j); loadHistory();
+    }else if(res.status===422){
+      setMsg($('appMsg'),"Couldn't find the paper and tool. Use a dark tool flat on a full white sheet, on a darker surface, shot straight down.",'err');
+    }else if(res.status===401){
+      setMsg($('appMsg'),'Not authorized — sign in again.','err');
+    }else{
+      setMsg($('appMsg'),'Error '+res.status+': '+(await res.text()).slice(0,160),'err');
+    }
+  }catch(err){
+    setMsg($('appMsg'),'Could not reach the server. Is the IP right and the page on http (not https)? '+err.message,'err');
+  }finally{
+    go.disabled=false; go.textContent=label;
+  }
+};
+
+function showResult(j){
+  $('overlay').src = j.urls.debug || j.urls.svg;
+  $('mTool').innerHTML = j.tool_mm[0]+' × '+j.tool_mm[1]+' <small>mm</small>';
+  $('mCut').innerHTML  = j.cutout_mm[0]+' × '+j.cutout_mm[1]+' <small>mm</small>';
+  $('dlDxf').href = j.urls.dxf;
+  $('dlSvg').href = j.urls.svg;
+  $('result').style.display='block';
+  $('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ---------- history ---------- */
+async function loadHistory(){
+  const {data:{session}} = await sb.auth.getSession(); if(!session) return;
+  try{
+    const res = await fetch(CONFIG.API_BASE+'/jobs', {headers:{Authorization:'Bearer '+session.access_token}});
+    if(!res.ok) return;
+    const jobs = await res.json();
+    const box=$('history');
+    if(!jobs.length){ box.innerHTML='<div class="msg info">No cutouts yet.</div>'; return; }
+    box.innerHTML = jobs.slice(0,8).map(j=>{
+      const sz = (j.cutout_w_mm!=null) ? `${j.cutout_w_mm} × ${j.cutout_h_mm} mm` : '—';
+      const dt = new Date(j.created_at).toLocaleString();
+      return `<div class="job"><span class="dot ${j.status}"></span>
+        <span class="sz">${sz}</span><span style="color:var(--muted)">${j.paper||''}</span>
+        <span class="dt">${dt}</span></div>`;
+    }).join('');
+  }catch(e){/* ignore */}
+}
+</script>
+</body>
+</html>
