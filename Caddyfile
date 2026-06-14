@@ -1,8 +1,20 @@
-# /etc/caddy/Caddyfile  — swap in your real domain.
-# Caddy fetches and renews HTTPS certs automatically.
-tools.yourdomain.com {
-    request_body {
-        max_size 25MB
+# /etc/caddy/Caddyfile — serves the web app at the root and proxies the API.
+toolcut.net {
+    encode gzip
+
+    # API endpoints go to the FastAPI backend
+    @api path /health /process /jobs /model
+    handle @api {
+        request_body {
+            max_size 25MB
+        }
+        reverse_proxy 127.0.0.1:8000
     }
-    reverse_proxy 127.0.0.1:8000
+
+    # Everything else serves the web app
+    handle {
+        root * /var/www/toolcut
+        try_files {path} /index.html
+        file_server
+    }
 }

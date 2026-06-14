@@ -10,82 +10,69 @@
 <style>
   :root{
     --bg:#0c0d10; --panel:#15171c; --panel-2:#1b1e25; --line:#2a2f38;
-    --text:#e9eaec; --muted:#888e99; --accent:#ff5500; --accent-dim:#b83e00;
+    --text:#e9eaec; --muted:#888e99; --accent:#ff5500; --edit:#19e6d6;
     --ok:#46c46a; --err:#ff5b5b;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{
-    background:var(--bg); color:var(--text);
-    font-family:'Space Mono',ui-monospace,monospace; font-size:14px; line-height:1.5;
-    min-height:100vh; -webkit-font-smoothing:antialiased;
-  }
+  body{background:var(--bg); color:var(--text);
+    font-family:'Space Mono',ui-monospace,monospace; font-size:14px; line-height:1.5; min-height:100vh}
   a{color:var(--accent)}
   .wrap{max-width:760px; margin:0 auto; padding:28px 20px 64px}
-
-  /* header */
-  header{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--line);
-    padding-bottom:16px; margin-bottom:28px; flex-wrap:wrap}
+  header{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--line); padding-bottom:16px; margin-bottom:28px; flex-wrap:wrap}
   .mark{font-family:'Bebas Neue',sans-serif; font-size:42px; letter-spacing:2px; line-height:.8}
   .mark b{color:var(--accent)}
   .tag{color:var(--muted); font-size:12px; letter-spacing:.5px}
   .who{margin-left:auto; display:flex; align-items:center; gap:12px; font-size:12px; color:var(--muted)}
   .who span{color:var(--text)}
-
-  /* panels */
   .panel{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:22px; margin-bottom:18px}
   .eyebrow{font-family:'Bebas Neue',sans-serif; letter-spacing:2px; font-size:18px; color:var(--muted); margin:0 0 14px}
   label.fld{display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:14px 0 6px}
-  input[type=email],input[type=password],select{
-    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text);
-    font-family:inherit; font-size:14px; padding:11px 12px; border-radius:3px}
+  input[type=email],input[type=password],input[type=number],select{width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text); font-family:inherit; font-size:14px; padding:11px 12px; border-radius:3px}
+  .sub{border-top:1px solid var(--line); margin-top:22px; padding-top:18px}
+  .viewer{height:320px; border:1px solid var(--line); border-radius:4px; background:#0c0d10; margin-top:14px; overflow:hidden}
+  .viewer canvas{display:block}
   input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-
-  /* buttons */
-  button{font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; border-radius:3px;
-    border:1px solid var(--line); background:var(--panel-2); color:var(--text);
-    padding:11px 16px; font-size:13px; letter-spacing:.5px}
+  button{font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; border-radius:3px; border:1px solid var(--line); background:var(--panel-2); color:var(--text); padding:11px 16px; font-size:13px; letter-spacing:.5px}
   button:hover{border-color:#3a414d}
   .primary{background:var(--accent); border-color:var(--accent); color:#140a00; text-transform:uppercase; letter-spacing:1px}
   .primary:hover{background:#ff6a26; border-color:#ff6a26}
   .primary:disabled{opacity:.55; cursor:not-allowed; background:#7a4a2e; border-color:#7a4a2e}
   .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
   .ghost{background:transparent}
-
-  /* dropzone */
-  .drop{border:1.5px dashed #3a414d; border-radius:4px; padding:30px 20px; text-align:center;
-    color:var(--muted); cursor:pointer; transition:border-color .15s, background .15s}
+  .drop{border:1.5px dashed #3a414d; border-radius:4px; padding:30px 20px; text-align:center; color:var(--muted); cursor:pointer; transition:border-color .15s, background .15s}
   .drop:hover,.drop.over{border-color:var(--accent); background:#17120d}
   .drop b{color:var(--text); font-weight:400}
   .drop .big{font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; color:var(--text); display:block; margin-bottom:4px}
   .thumb{max-height:180px; max-width:100%; border-radius:3px; border:1px solid var(--line); margin-top:4px}
-
   .opts{display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end; margin-top:6px}
   .opts > div{flex:1; min-width:150px}
   .toggle{display:flex; align-items:center; gap:9px; cursor:pointer; user-select:none; padding-bottom:11px}
   .toggle input{accent-color:var(--accent); width:16px; height:16px}
-
-  /* result */
   #result{display:none}
-  .overlay-img{width:100%; border:1px solid var(--line); border-radius:4px; display:block; background:#000}
+  .ehint{font-size:11px; color:var(--muted); margin-bottom:12px; line-height:1.6}
+  .ehint b{color:var(--edit); font-weight:400}
+  .stage{position:relative; line-height:0; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#000}
+  .stage img{width:100%; display:block}
+  .stage svg{position:absolute; inset:0; width:100%; height:100%; touch-action:none}
+  .ectl{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:14px; font-size:12px; color:var(--muted)}
+  .ectl input[type=range]{accent-color:var(--edit); width:150px; vertical-align:middle}
+  .ectl .grow{flex:1}
   .readout{display:flex; gap:14px; flex-wrap:wrap; margin:18px 0}
-  .gauge{flex:1; min-width:160px; background:var(--bg); border:1px solid var(--line);
-    border-left:3px solid var(--accent); border-radius:3px; padding:12px 14px}
+  .gauge{flex:1; min-width:160px; background:var(--bg); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:3px; padding:12px 14px}
+  .gauge.edit{border-left-color:var(--edit)}
   .gauge .k{font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted)}
   .gauge .v{font-family:'Bebas Neue',sans-serif; font-size:38px; line-height:1; letter-spacing:1px; color:var(--accent); margin-top:4px}
+  .gauge.edit .v{color:var(--edit)}
   .gauge .v small{font-family:'Space Mono',monospace; font-size:13px; color:var(--muted); letter-spacing:0}
-
-  /* history */
   .job{display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); font-size:12px}
   .job:last-child{border-bottom:0}
   .dot{width:8px; height:8px; border-radius:50%; flex:none}
   .dot.done{background:var(--ok)} .dot.error{background:var(--err)} .dot.processing{background:var(--accent)}
   .job .sz{color:var(--text)} .job .dt{margin-left:auto; color:var(--muted)}
-
   .msg{font-size:12px; margin-top:12px; min-height:16px}
   .msg.err{color:var(--err)} .msg.ok{color:var(--ok)} .msg.info{color:var(--muted)}
-  .spinner{display:inline-block; width:13px; height:13px; border:2px solid #ffffff55; border-top-color:#140a00;
-    border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:7px}
+  .spinner{display:inline-block; width:13px; height:13px; border:2px solid #ffffff55; border-top-color:#140a00; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-2px; margin-right:7px}
   @keyframes spin{to{transform:rotate(360deg)}}
   footer{color:var(--muted); font-size:11px; text-align:center; margin-top:34px; line-height:1.7}
   .hidden{display:none !important}
@@ -96,11 +83,10 @@
 <div class="wrap">
   <header>
     <div class="mark">TOOL<b>CUT</b></div>
-    <div class="tag">photo → foam cutout</div>
+    <div class="tag">photo &rarr; foam cutout</div>
     <div class="who hidden" id="who"><span id="whoEmail"></span><button class="ghost" id="signout">Sign out</button></div>
   </header>
 
-  <!-- AUTH -->
   <section id="authView">
     <div class="panel">
       <p class="eyebrow">Sign in</p>
@@ -112,79 +98,95 @@
         <button class="primary" id="signin">Sign in</button>
         <button id="signup">Create account</button>
       </div>
-      <div class="msg info" id="authMsg">Pre-filled with your test account — just press Sign in.</div>
+      <div class="msg info" id="authMsg">Pre-filled with your test account &mdash; just press Sign in.</div>
     </div>
   </section>
 
-  <!-- APP -->
   <section id="appView" class="hidden">
     <div class="panel">
       <p class="eyebrow">New cutout</p>
       <div class="drop" id="drop">
         <span class="big">Drop a photo</span>
-        <b>or tap to choose</b> — a tool flat on a full sheet of printer paper, shot from above
+        <b>or tap to choose</b> &mdash; a tool flat on a full sheet of printer paper, shot from above
         <input id="file" type="file" accept="image/*" capture="environment" class="hidden">
         <div><img id="thumb" class="thumb hidden" alt=""></div>
       </div>
-
       <div class="opts">
         <div>
           <label class="fld" for="paper">Paper under the tool</label>
           <select id="paper">
-            <option value="letter">US Letter (8.5 × 11 in)</option>
-            <option value="a4">A4 (210 × 297 mm)</option>
+            <option value="letter">US Letter (8.5 &times; 11 in)</option>
+            <option value="a4">A4 (210 &times; 297 mm)</option>
           </select>
         </div>
         <label class="toggle"><input type="checkbox" id="fingers" checked> Add finger scoops</label>
       </div>
-
-      <div class="row">
-        <button class="primary" id="go" disabled>Make cutout</button>
-      </div>
+      <div class="row"><button class="primary" id="go" disabled>Make cutout</button></div>
       <div class="msg" id="appMsg"></div>
     </div>
 
-    <!-- RESULT -->
     <div class="panel" id="result">
-      <p class="eyebrow">Result</p>
-      <img id="overlay" class="overlay-img" alt="Detected outline over your photo">
+      <p class="eyebrow">Adjust &amp; download</p>
+      <div class="ehint"><b>Drag</b> a dot to move it &middot; <b>click a line</b> to add a point &middot; tap a dot and press <b>Delete</b> to remove it</div>
+      <div class="stage">
+        <img id="overlay" alt="Detected outline over your photo">
+        <svg id="ov" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="ectl">
+        <span>Detail <input type="range" id="simp" min="0" max="4" step="0.1" value="0"></span>
+        <span id="ptcount"></span>
+        <span class="grow"></span>
+        <button class="ghost" id="delPt">Delete point</button>
+        <button class="ghost" id="resetEdit">Reset</button>
+      </div>
       <div class="readout">
-        <div class="gauge"><div class="k">Measured tool</div><div class="v" id="mTool">— <small>mm</small></div></div>
-        <div class="gauge"><div class="k">Cutout + clearance</div><div class="v" id="mCut">— <small>mm</small></div></div>
+        <div class="gauge"><div class="k">Measured tool</div><div class="v" id="mTool">&mdash; <small>mm</small></div></div>
+        <div class="gauge edit"><div class="k">Cutout (live)</div><div class="v" id="mCut">&mdash; <small>mm</small></div></div>
       </div>
       <div class="row">
-        <a id="dlDxf" class="primary" style="text-decoration:none" download>Download DXF</a>
-        <a id="dlSvg" download><button class="ghost">Download SVG</button></a>
+        <button class="primary" id="dlDxf">Download DXF</button>
+        <button class="ghost" id="dlSvg">Download SVG</button>
+      </div>
+
+      <div class="sub">
+        <p class="eyebrow">3D tray (STL)</p>
+        <div class="opts">
+          <div><label class="fld" for="mDepth">Pocket depth (mm)</label><input type="number" id="mDepth" value="25" min="2" max="200" step="1"></div>
+          <div><label class="fld" for="mWall">Wall around tool (mm)</label><input type="number" id="mWall" value="15" min="0" max="100" step="1"></div>
+          <div><label class="fld" for="mFloor">Floor thickness (mm)</label><input type="number" id="mFloor" value="6" min="1" max="50" step="1"></div>
+          <div><label class="fld" for="mStyle">Block shape</label>
+            <select id="mStyle"><option value="rect">Rectangular</option><option value="contour">Follow tool shape</option></select></div>
+        </div>
+        <div class="row"><button class="primary" id="gen3d">Generate 3D model</button></div>
+        <div class="msg" id="m3dMsg"></div>
+        <div id="viewer3d" class="viewer hidden"></div>
+        <div class="readout hidden" id="m3dReadout">
+          <div class="gauge edit"><div class="k">Tray size (W &times; D &times; H)</div><div class="v" id="mTray">&mdash; <small>mm</small></div></div>
+        </div>
+        <div class="row hidden" id="stlRow"><button class="primary" id="dlStl">Download STL</button></div>
       </div>
     </div>
 
-    <!-- HISTORY -->
     <div class="panel">
       <p class="eyebrow">Recent</p>
       <div id="history"><div class="msg info">No cutouts yet.</div></div>
     </div>
   </section>
 
-  <footer>
-    Test build · running over plain HTTP on your Lightsail IP.<br>
-    Add a domain + HTTPS before sharing with real people.
-  </footer>
+  <footer>Test build &middot; running over plain HTTP on your Lightsail IP.<br>Add a domain + HTTPS before sharing with real people.</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-/* ============================================================
-   CONFIG — fill in SUPABASE_ANON_KEY with your PUBLISHABLE key
-   (the public one, safe to ship in a client). The other two
-   are already set for your project.
-   ============================================================ */
 const CONFIG = {
   SUPABASE_URL:      'https://epyirdygcxwciintcrsu.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVweWlyZHlnY3h3Y2lpbnRjcnN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNzU2NDMsImV4cCI6MjA5Njg1MTY0M30.sr5sRS0cuC-bz9W-n4wECd9XEbzEYeVS-wWdqp7QOe0',
-  API_BASE:          'http://3.23.254.220',
+  API_BASE:          'https://toolcut.net',
 };
 
-// localStorage fallback so this never crashes if previewed in a sandbox
 function makeStorage(){
   try{ const k='__tc'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return localStorage; }
   catch(e){ const m={}; return {getItem:k=>k in m?m[k]:null,setItem:(k,v)=>{m[k]=String(v)},removeItem:k=>{delete m[k]}}; }
@@ -195,106 +197,227 @@ const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY,
 const $ = id => document.getElementById(id);
 const authView=$('authView'), appView=$('appView'), who=$('who');
 
-/* ---------- auth ---------- */
+/* ---- auth ---- */
 function renderSession(session){
-  const on = !!session;
-  authView.classList.toggle('hidden', on);
-  appView.classList.toggle('hidden', !on);
-  who.classList.toggle('hidden', !on);
-  if(on){ $('whoEmail').textContent = session.user.email; loadHistory(); }
+  const on=!!session;
+  authView.classList.toggle('hidden',on); appView.classList.toggle('hidden',!on); who.classList.toggle('hidden',!on);
+  if(on){ $('whoEmail').textContent=session.user.email; loadHistory(); }
 }
 sb.auth.getSession().then(({data})=>renderSession(data.session));
 sb.auth.onAuthStateChange((_e,session)=>renderSession(session));
+function setMsg(el,t,k){ el.className='msg '+(k||''); el.textContent=t; }
+$('signin').onclick=async()=>{ setMsg($('authMsg'),'Signing in...','info');
+  const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('pw').value});
+  if(error) setMsg($('authMsg'),error.message,'err'); };
+$('signup').onclick=async()=>{ setMsg($('authMsg'),'Creating account...','info');
+  const {data,error}=await sb.auth.signUp({email:$('email').value.trim(),password:$('pw').value});
+  if(error){ setMsg($('authMsg'),error.message,'err'); return; }
+  if(!data.session) setMsg($('authMsg'),'Account created. Check your email to confirm, then sign in.','ok'); };
+$('signout').onclick=()=>sb.auth.signOut();
 
-function setMsg(el,text,kind){ el.className='msg '+(kind||''); el.textContent=text; }
-
-$('signin').onclick = async () => {
-  setMsg($('authMsg'),'Signing in…','info');
-  const {error} = await sb.auth.signInWithPassword({email:$('email').value.trim(), password:$('pw').value});
-  if(error) setMsg($('authMsg'), error.message, 'err');
-};
-$('signup').onclick = async () => {
-  setMsg($('authMsg'),'Creating account…','info');
-  const {data,error} = await sb.auth.signUp({email:$('email').value.trim(), password:$('pw').value});
-  if(error){ setMsg($('authMsg'), error.message, 'err'); return; }
-  if(!data.session) setMsg($('authMsg'),'Account created. Check your email to confirm, then sign in.','ok');
-};
-$('signout').onclick = () => sb.auth.signOut();
-
-/* ---------- file selection ---------- */
+/* ---- file pick ---- */
 const drop=$('drop'), fileInput=$('file'), thumb=$('thumb'), go=$('go');
-drop.onclick = e => { if(e.target.tagName!=='INPUT') fileInput.click(); };
+drop.onclick=e=>{ if(e.target.tagName!=='INPUT') fileInput.click(); };
 ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
-drop.addEventListener('drop', e=>{ if(e.dataTransfer.files[0]){ fileInput.files=e.dataTransfer.files; showThumb(); }});
-fileInput.onchange = showThumb;
-function showThumb(){
-  const f=fileInput.files[0]; if(!f) return;
-  thumb.src=URL.createObjectURL(f); thumb.classList.remove('hidden');
-  go.disabled=false; setMsg($('appMsg'),'','');
-}
+drop.addEventListener('drop',e=>{ if(e.dataTransfer.files[0]){ fileInput.files=e.dataTransfer.files; showThumb(); }});
+fileInput.onchange=showThumb;
+function showThumb(){ const f=fileInput.files[0]; if(!f) return; thumb.src=URL.createObjectURL(f); thumb.classList.remove('hidden'); go.disabled=false; setMsg($('appMsg'),'',''); }
 
-/* ---------- process ---------- */
-go.onclick = async () => {
+/* ---- process ---- */
+go.onclick=async()=>{
   const f=fileInput.files[0]; if(!f) return;
-  const {data:{session}} = await sb.auth.getSession();
-  if(!session){ setMsg($('appMsg'),'Session expired — sign in again.','err'); return; }
-
-  go.disabled=true; const label=go.textContent;
-  go.innerHTML='<span class="spinner"></span>Working…';
-  setMsg($('appMsg'),'','');
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ setMsg($('appMsg'),'Session expired - sign in again.','err'); return; }
+  go.disabled=true; const label=go.textContent; go.innerHTML='<span class="spinner"></span>Working...'; setMsg($('appMsg'),'','');
   try{
     const fd=new FormData();
-    fd.append('image', f);
-    fd.append('paper', $('paper').value);
-    fd.append('finger_holes', $('fingers').checked ? 'true':'false');
-    fd.append('debug','true');
-    const res = await fetch(CONFIG.API_BASE+'/process', {
-      method:'POST', headers:{Authorization:'Bearer '+session.access_token}, body:fd
-    });
-    if(res.status===200){
-      const j=await res.json(); showResult(j); loadHistory();
-    }else if(res.status===422){
-      setMsg($('appMsg'),"Couldn't find the paper and tool. Use a dark tool flat on a full white sheet, on a darker surface, shot straight down.",'err');
-    }else if(res.status===401){
-      setMsg($('appMsg'),'Not authorized — sign in again.','err');
-    }else{
-      setMsg($('appMsg'),'Error '+res.status+': '+(await res.text()).slice(0,160),'err');
-    }
-  }catch(err){
-    setMsg($('appMsg'),'Could not reach the server. Is the IP right and the page on http (not https)? '+err.message,'err');
-  }finally{
-    go.disabled=false; go.textContent=label;
-  }
+    fd.append('image',f); fd.append('paper',$('paper').value);
+    fd.append('finger_holes',$('fingers').checked?'true':'false'); fd.append('debug','true');
+    const res=await fetch(CONFIG.API_BASE+'/process',{method:'POST',headers:{Authorization:'Bearer '+session.access_token},body:fd});
+    if(res.status===200){ showResult(await res.json()); loadHistory(); }
+    else if(res.status===422){ setMsg($('appMsg'),"Couldn't find the paper and tool. Use a dark tool flat on a full white sheet, on a darker surface, shot straight down.",'err'); }
+    else if(res.status===401){ setMsg($('appMsg'),'Not authorized - sign in again.','err'); }
+    else{ setMsg($('appMsg'),'Error '+res.status+': '+(await res.text()).slice(0,160),'err'); }
+  }catch(err){ setMsg($('appMsg'),'Could not reach the server. Is the page on http (not https) and the IP right? '+err.message,'err'); }
+  finally{ go.disabled=false; go.textContent=label; }
 };
 
-function showResult(j){
-  $('overlay').src = j.urls.debug || j.urls.svg;
-  $('mTool').innerHTML = j.tool_mm[0]+' × '+j.tool_mm[1]+' <small>mm</small>';
-  $('mCut').innerHTML  = j.cutout_mm[0]+' × '+j.cutout_mm[1]+' <small>mm</small>';
-  $('dlDxf').href = j.urls.dxf;
-  $('dlSvg').href = j.urls.svg;
-  $('result').style.display='block';
-  $('result').scrollIntoView({behavior:'smooth', block:'start'});
+/* ================= EDITOR ================= */
+const E={ ppm:8, original:[], rings:[], selected:null, drag:null };
+const ov=$('ov');
+
+function perpDist(p,a,b){
+  const dx=b[0]-a[0], dy=b[1]-a[1];
+  if(dx===0&&dy===0) return Math.hypot(p[0]-a[0],p[1]-a[1]);
+  let t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy);
+  t=Math.max(0,Math.min(1,t));
+  return Math.hypot(p[0]-(a[0]+t*dx), p[1]-(a[1]+t*dy));
+}
+function rdpOpen(pts,eps){
+  if(pts.length<3) return pts.slice();
+  let dmax=0,idx=0;
+  for(let i=1;i<pts.length-1;i++){ const d=perpDist(pts[i],pts[0],pts[pts.length-1]); if(d>dmax){dmax=d;idx=i;} }
+  if(dmax>eps){ const l=rdpOpen(pts.slice(0,idx+1),eps), r=rdpOpen(pts.slice(idx),eps); return l.slice(0,-1).concat(r); }
+  return [pts[0],pts[pts.length-1]];
+}
+function rdpClosed(ring,eps){
+  let P=ring.map(p=>[...p]);
+  if(P.length>2 && P[0][0]===P[P.length-1][0] && P[0][1]===P[P.length-1][1]) P.pop();
+  if(P.length<4||eps<=0) return P;
+  let far=0,fd=-1; for(let i=1;i<P.length;i++){ const d=Math.hypot(P[i][0]-P[0][0],P[i][1]-P[0][1]); if(d>fd){fd=d;far=i;} }
+  const a=P.slice(0,far+1), b=P.slice(far).concat([P[0]]);
+  const ra=rdpOpen(a,eps), rb=rdpOpen(b,eps);
+  return ra.slice(0,-1).concat(rb.slice(0,-1));
+}
+function stripClose(r){ let rr=r.map(p=>[...p]); if(rr.length>1 && rr[0][0]===rr[rr.length-1][0] && rr[0][1]===rr[rr.length-1][1]) rr.pop(); return rr; }
+function clientToMM(cx,cy){ const pt=ov.createSVGPoint(); pt.x=cx; pt.y=cy; const l=pt.matrixTransform(ov.getScreenCTM().inverse()); return {x:l.x/E.ppm, y:l.y/E.ppm}; }
+function bbox(rings){ let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity; rings.forEach(r=>r.forEach(([x,y])=>{a=Math.min(a,x);b=Math.min(b,y);c=Math.max(c,x);d=Math.max(d,y);})); return [c-a,d-b]; }
+
+function render(){
+  const img=$('overlay'); const W=img.naturalWidth||800, H=img.naturalHeight||600;
+  ov.setAttribute('viewBox','0 0 '+W+' '+H);
+  const R=Math.max(W,H)/120;
+  let h='';
+  E.rings.forEach((ring,ri)=>{
+    const pts=ring.map(p=>(p[0]*E.ppm)+','+(p[1]*E.ppm)).join(' ')+' '+(ring[0][0]*E.ppm)+','+(ring[0][1]*E.ppm);
+    h+='<polyline points="'+pts+'" fill="none" stroke="#19e6d6" stroke-width="'+(R*0.45)+'"/>';
+    h+='<polyline class="hit" data-ri="'+ri+'" points="'+pts+'" fill="none" stroke="#000" stroke-opacity="0" stroke-width="'+(R*3)+'" style="pointer-events:stroke;cursor:copy"/>';
+  });
+  E.rings.forEach((ring,ri)=>ring.forEach((p,pi)=>{
+    const sel=E.selected&&E.selected.ri===ri&&E.selected.pi===pi;
+    h+='<circle data-ri="'+ri+'" data-pi="'+pi+'" cx="'+(p[0]*E.ppm)+'" cy="'+(p[1]*E.ppm)+'" r="'+R+'" fill="'+(sel?'#fff':'#19e6d6')+'" stroke="'+(sel?'#19e6d6':'#0b3b37')+'" stroke-width="'+(R*0.35)+'" style="cursor:grab;pointer-events:all"/>';
+  }));
+  ov.innerHTML=h;
+  ov.querySelectorAll('circle').forEach(c=>c.addEventListener('pointerdown',onHandleDown));
+  ov.querySelectorAll('polyline.hit').forEach(l=>l.addEventListener('pointerdown',onLineDown));
+  const [w,hh]=bbox(E.rings);
+  $('mCut').innerHTML=w.toFixed(1)+' &times; '+hh.toFixed(1)+' <small>mm</small>';
+  $('ptcount').textContent=E.rings.reduce((a,r)=>a+r.length,0)+' points';
+}
+function onHandleDown(e){
+  e.stopPropagation();
+  const ri=+e.currentTarget.dataset.ri, pi=+e.currentTarget.dataset.pi;
+  E.selected={ri,pi}; E.drag={ri,pi};
+  try{ ov.setPointerCapture(e.pointerId); }catch(_){}
+  render();
+}
+function onLineDown(e){
+  const ri=+e.currentTarget.dataset.ri, ring=E.rings[ri], m=clientToMM(e.clientX,e.clientY);
+  let best=0,bd=Infinity;
+  for(let i=0;i<ring.length;i++){ const d=perpDist([m.x,m.y],ring[i],ring[(i+1)%ring.length]); if(d<bd){bd=d;best=i;} }
+  ring.splice(best+1,0,[+m.x.toFixed(2),+m.y.toFixed(2)]);
+  E.selected={ri,pi:best+1}; render();
+}
+ov.addEventListener('pointermove',e=>{ if(!E.drag) return; const m=clientToMM(e.clientX,e.clientY); E.rings[E.drag.ri][E.drag.pi]=[+m.x.toFixed(2),+m.y.toFixed(2)]; render(); });
+ov.addEventListener('pointerup',()=>{ E.drag=null; });
+ov.addEventListener('pointercancel',()=>{ E.drag=null; });
+function deleteSelected(){ if(!E.selected) return; const {ri,pi}=E.selected; const ring=E.rings[ri]; if(ring.length<=3) return; ring.splice(pi,1); E.selected=null; render(); }
+$('delPt').onclick=deleteSelected;
+document.addEventListener('keydown',e=>{ if((e.key==='Delete'||e.key==='Backspace')&&E.selected&&$('result').style.display!=='none'){ e.preventDefault(); deleteSelected(); } });
+$('simp').oninput=()=>{ const tol=parseFloat($('simp').value); E.rings=E.original.map(r=>rdpClosed(r,tol)); E.selected=null; render(); };
+$('resetEdit').onclick=()=>{ $('simp').value=0; E.rings=E.original.map(r=>r.map(p=>[...p])); E.selected=null; render(); };
+
+function toSVG(rings){
+  let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;
+  rings.forEach(r=>r.forEach(([x,y])=>{a=Math.min(a,x);b=Math.min(b,y);c=Math.max(c,x);d=Math.max(d,y);}));
+  const m=10,W=(c-a)+2*m,Hh=(d-b)+2*m;
+  const paths=rings.map(r=>'<path d="M '+r.map(([x,y])=>(x-a+m).toFixed(3)+','+(y-b+m).toFixed(3)).join(' L ')+' Z" fill="none" stroke="black" stroke-width="0.3"/>').join('\n');
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+W.toFixed(2)+'mm" height="'+Hh.toFixed(2)+'mm" viewBox="0 0 '+W.toFixed(3)+' '+Hh.toFixed(3)+'">\n'+paths+'\n</svg>\n';
+}
+function toDXF(rings){
+  let s='0\nSECTION\n2\nHEADER\n9\n$INSUNITS\n70\n4\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n';
+  rings.forEach(r=>{ s+='0\nLWPOLYLINE\n8\n0\n90\n'+r.length+'\n70\n1\n'; r.forEach(([x,y])=>{ s+='10\n'+x+'\n20\n'+y+'\n'; }); });
+  return s+'0\nENDSEC\n0\nEOF\n';
+}
+function download(name,text,mime){ const u=URL.createObjectURL(new Blob([text],{type:mime})); const a=document.createElement('a'); a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1000); }
+$('dlSvg').onclick=()=>download('cutout.svg',toSVG(E.rings),'image/svg+xml');
+$('dlDxf').onclick=()=>download('cutout.dxf',toDXF(E.rings),'application/dxf');
+
+/* ================= 3D TRAY ================= */
+let stlBlobUrl=null;
+function inputNum(id,def){ const v=parseFloat($(id).value); return isFinite(v)?v:def; }
+$('gen3d').onclick=async()=>{
+  if(!E.rings.length){ setMsg($('m3dMsg'),'Make a cutout first.','err'); return; }
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ setMsg($('m3dMsg'),'Session expired - sign in again.','err'); return; }
+  const btn=$('gen3d'), lbl=btn.textContent; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Building...'; setMsg($('m3dMsg'),'','');
+  try{
+    const body={ rings_mm:E.rings, pocket_depth_mm:inputNum('mDepth',25),
+      wall_mm:inputNum('mWall',15), floor_mm:inputNum('mFloor',6), style:$('mStyle').value };
+    const res=await fetch(CONFIG.API_BASE+'/model',{method:'POST',
+      headers:{'Authorization':'Bearer '+session.access_token,'Content-Type':'application/json'},
+      body:JSON.stringify(body)});
+    if(res.status!==200){ setMsg($('m3dMsg'),'Error '+res.status+': '+(await res.text()).slice(0,160),'err'); return; }
+    const j=await res.json();
+    const bytes=Uint8Array.from(atob(j.stl_b64), c=>c.charCodeAt(0));
+    if(stlBlobUrl) URL.revokeObjectURL(stlBlobUrl);
+    stlBlobUrl=URL.createObjectURL(new Blob([bytes],{type:'model/stl'}));
+    $('stlRow').classList.remove('hidden');
+    $('mTray').innerHTML=j.model_mm[0]+' &times; '+j.model_mm[1]+' &times; '+j.model_mm[2]+' <small>mm</small>';
+    $('m3dReadout').classList.remove('hidden');
+    show3D(bytes.buffer);
+  }catch(err){ setMsg($('m3dMsg'),'Could not reach the server. '+err.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent=lbl; }
+};
+$('dlStl').onclick=()=>{ if(!stlBlobUrl) return; const a=document.createElement('a'); a.href=stlBlobUrl; a.download='tray.stl'; a.click(); };
+
+function show3D(buffer){
+  const host=$('viewer3d'); host.classList.remove('hidden');
+  if(typeof THREE==='undefined' || !THREE.STLLoader){
+    host.innerHTML='<div class="msg info" style="padding:14px">3D preview library didn\u2019t load, but your STL downloads fine \u2014 open it in your slicer to view.</div>';
+    return;
+  }
+  host.innerHTML='';
+  const w=host.clientWidth||600, h=host.clientHeight||320;
+  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0c0d10);
+  const cam=new THREE.PerspectiveCamera(45, w/h, 0.1, 8000);
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(w,h); renderer.setPixelRatio(window.devicePixelRatio||1);
+  host.appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,0.65));
+  const d1=new THREE.DirectionalLight(0xffffff,0.85); d1.position.set(1,2,1.5); scene.add(d1);
+  const d2=new THREE.DirectionalLight(0xff7a3c,0.35); d2.position.set(-1.5,-1,-1); scene.add(d2);
+  const geo=new THREE.STLLoader().parse(buffer);
+  geo.center(); geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo, new THREE.MeshStandardMaterial({color:0xff5500, metalness:0.1, roughness:0.6}));
+  mesh.rotation.x=-Math.PI/2;          // STL is Z-up; tilt so it sits flat
+  scene.add(mesh);
+  geo.computeBoundingSphere(); const r=(geo.boundingSphere&&geo.boundingSphere.radius)||100;
+  cam.position.set(r*1.5, r*1.5, r*1.9); cam.lookAt(0,0,0);
+  let controls=null;
+  if(THREE.OrbitControls){ controls=new THREE.OrbitControls(cam, renderer.domElement); controls.enableDamping=true; controls.target.set(0,0,0); }
+  (function loop(){ requestAnimationFrame(loop); if(controls) controls.update(); renderer.render(scene,cam); })();
 }
 
-/* ---------- history ---------- */
+function showResult(j){
+  E.ppm=j.px_per_mm||8;
+  E.original=(j.rings_mm||[]).map(stripClose);
+  E.rings=E.original.map(r=>r.map(p=>[...p]));
+  E.selected=null; $('simp').value=0;
+  $('mTool').innerHTML=j.tool_mm[0]+' &times; '+j.tool_mm[1]+' <small>mm</small>';
+  const img=$('overlay');
+  img.onload=render;
+  img.src=j.urls.debug||j.urls.svg;
+  if(img.complete && img.naturalWidth) render();
+  $('result').style.display='block';
+  $('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ---- history ---- */
 async function loadHistory(){
-  const {data:{session}} = await sb.auth.getSession(); if(!session) return;
+  const {data:{session}}=await sb.auth.getSession(); if(!session) return;
   try{
-    const res = await fetch(CONFIG.API_BASE+'/jobs', {headers:{Authorization:'Bearer '+session.access_token}});
+    const res=await fetch(CONFIG.API_BASE+'/jobs',{headers:{Authorization:'Bearer '+session.access_token}});
     if(!res.ok) return;
-    const jobs = await res.json();
-    const box=$('history');
+    const jobs=await res.json(); const box=$('history');
     if(!jobs.length){ box.innerHTML='<div class="msg info">No cutouts yet.</div>'; return; }
-    box.innerHTML = jobs.slice(0,8).map(j=>{
-      const sz = (j.cutout_w_mm!=null) ? `${j.cutout_w_mm} × ${j.cutout_h_mm} mm` : '—';
-      const dt = new Date(j.created_at).toLocaleString();
-      return `<div class="job"><span class="dot ${j.status}"></span>
-        <span class="sz">${sz}</span><span style="color:var(--muted)">${j.paper||''}</span>
-        <span class="dt">${dt}</span></div>`;
+    box.innerHTML=jobs.slice(0,8).map(j=>{
+      const sz=(j.cutout_w_mm!=null)?(j.cutout_w_mm+' &times; '+j.cutout_h_mm+' mm'):'&mdash;';
+      const dt=new Date(j.created_at).toLocaleString();
+      return '<div class="job"><span class="dot '+j.status+'"></span><span class="sz">'+sz+'</span><span style="color:var(--muted)">'+(j.paper||'')+'</span><span class="dt">'+dt+'</span></div>';
     }).join('');
-  }catch(e){/* ignore */}
+  }catch(e){}
 }
 </script>
 </body>
