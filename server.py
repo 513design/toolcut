@@ -209,10 +209,14 @@ def process(
             "debug_key": stored.get("debug", (None,))[0],
         }
         update_job(job_id, fields)
+        rings = [[[round(x, 2), round(y, 2)] for (x, y) in ring]
+                 for ring in toolcut._rings(poly)]
         return {
             "job_id": job_id,
             "tool_mm": [fields["tool_w_mm"], fields["tool_h_mm"]],
             "cutout_mm": [fields["cutout_w_mm"], fields["cutout_h_mm"]],
+            "rings_mm": rings,
+            "px_per_mm": px_per_mm,
             "urls": {k: v[1] for k, v in stored.items()},
             "url_expires_in": URL_TTL,
         }
