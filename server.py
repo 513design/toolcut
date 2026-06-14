@@ -16,6 +16,7 @@ Required env (see .env.example):
   SUPABASE_JWT_SECRET         optional — only for legacy HS256 projects
 """
 
+import base64
 import os
 import uuid
 import tempfile
@@ -27,8 +28,18 @@ import numpy as np
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from jwt import PyJWKClient
+from pydantic import BaseModel
 
+import model3d
 import toolcut
+
+
+class ModelReq(BaseModel):
+    rings_mm: list
+    pocket_depth_mm: float = 25.0
+    wall_mm: float = 15.0
+    floor_mm: float = 6.0
+    style: str = "rect"
 
 # --------------------------------------------------------------------------
 # Config
@@ -155,6 +166,18 @@ def list_jobs(user_id: str = Depends(current_user)):
     r = _rest.get(f"/jobs?user_id=eq.{user_id}&order=created_at.desc&limit=50")
     r.raise_for_status()
     return r.json()
+
+
+@app.post("/model")
+def make_model(req: ModelReq, user_id: str = Depends(current_user)):
+    if not req.rings_mm:
+        raise HTTPException(400, "no outline supplied")
+    try:
+        stl, dims = model3d.build_tray_stl(
+            req.rings_mm, req.pocket_depth_mm, req.wall_mm, req.floor_mm, req.style)
+    except Exception as e:
+        raise HTTPException(422, f"could not build model: {e}")
+    return {"stl_b64": base64.b64encode(stl).decode(), "model_mm": list(dims)}
 
 
 @app.post("/process")

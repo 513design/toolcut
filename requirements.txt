@@ -7,3 +7,5 @@ shapely
 ezdxf
 PyJWT[crypto]
 httpx
+trimesh
+manifold3d
